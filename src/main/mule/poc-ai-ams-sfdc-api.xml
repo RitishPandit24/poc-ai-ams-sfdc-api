@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:tracing="http://www.mulesoft.org/schema/mule/tracing" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/tracing http://www.mulesoft.org/schema/mule/tracing/current/mule-tracing.xsd">
+    <http:listener-config name="employee-mgmt-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="employee-mgmt-api-config" api="employee-mgmt-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="poc-ai-ams-sfdc-api-main">
+        <http:listener config-ref="employee-mgmt-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="990aa367-25a5-4fb0-a965-785d606019a2" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="correlationID" ><![CDATA[%dw 2.0
+output application/json
+---
+uuid()]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<tracing:with-correlation-id doc:name="With CorrelationID" doc:id="df55557f-21e3-4927-bb78-8e32957bce6c" correlationId="#[vars.correlationID]">
+			<logger level="INFO" doc:name="Logger" doc:id="fe0ead57-d576-461e-8fc3-50b8caaac0b5" message="poc-ai-ams-sfdc-api-main - Start"/>
+			<try doc:name="Try" doc:id="9188e7d2-bb5e-4b84-8395-bc133e6e7386">
+			<apikit:router config-ref="employee-mgmt-api-config" />
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b8fb90c7-67d1-4e15-8925-5c5691de1da9" type="ANY">
+					<ee:transform doc:name="Transform Message" doc:id="c17b41c8-40bd-4f1e-9fbb-a544de85f22d">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    event: "event: " ++ vars.correlationID,
+    message: error.description default error.detailedDescription,
+    orgId: p("anypoint.orgId") default "",
+    envId: p("anypoint.envId") default "",
+    timestamp: now(),
+    appId: app.name default ""
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="a023f31d-a187-438e-83da-fb603806ac9b" message="#[payload]"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+			<logger level="INFO" doc:name="Logger" doc:id="4aabd497-6f36-40f0-b929-63702b4e4663" message="poc-ai-ams-sfdc-api-main - End"/>
+		</tracing:with-correlation-id>
+    </flow>
+    <flow name="put:\employees:application\json:employee-mgmt-api-config">
+        <flow-ref doc:name="update-employee" doc:id="e5e58cd9-6b3a-4c65-b62a-2bdb4902ec09" name="update-employee-flow"/>
+    </flow>
+    <flow name="delete:\employees:employee-mgmt-api-config">
+        <flow-ref doc:name="delete-employee" doc:id="93ad38da-c78e-4a28-9ae9-7ab5adc93ec6" name="delete-employee-flow"/>
+    </flow>
+    <flow name="get:\employees:employee-mgmt-api-config">
+		<flow-ref doc:name="retieve-employees" doc:id="5e9205b3-2bbb-436f-aa1a-46b06cbafa90" name="retieve-employees-flow"/>
+    </flow>
+    <flow name="post:\employees:application\json:employee-mgmt-api-config">
+        <flow-ref doc:name="create-employees" doc:id="19fbb07b-747d-4c74-94fd-f0876da08766" name="create-employees-flow"/>
+    </flow>
+</mule>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+	<sub-flow name="create-employees-flow" doc:id="e2714a1d-bfc8-4e99-964e-d2208f2b5a12" >
+		<ee:transform doc:name="Transform Message" doc:id="2be388b7-1c82-499f-9eb3-45c246ff99c5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload map (item) -> {
+    Name: item.name,
+    Employee_ID__c: item.empID,
+    Age__c: item.age,
+    Salary__c: item.salary,
+    Is_Active__c: item.isActive,
+    Joining_Date__c: item.joiningDate as Date {format: "yyyy-MM-dd"}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="99b5496c-9d12-44e4-8faf-2962ccaf4aa4" config-ref="Salesforce_Config_old" type="${create.type}"/>
+		<ee:transform doc:name="Transform Message" doc:id="a77ca0f6-bd96-414a-b894-3366a2a9e06b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="dcdb0476-3502-4cc7-9d90-ed0356820194" >
+		<salesforce:basic-connection username="ritishpandit24.82f95e3efcd6@agentforce.com" password="Ritishpandit01@" securityToken="nixzHpOuOmZ45CvDcS5krk9F" url="https://login.salesforce.com/services/Soap/u/57.0" />
+	</salesforce:sfdc-config>
+	<configuration-properties doc:name="Env Configuration properties" doc:id="c917a5c6-93d3-4de0-8807-78f8bb1e0716" file="properties/${env}.properties" />
+	<configuration-properties doc:name="Default Configuration properties" doc:id="42a21c52-295b-4d6d-a0a3-c232b70a5f1c" file="properties/default.properties" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="9a2ebcc4-be44-4dba-b4b0-a4ef9e68de01" file="properties/${env}-secure.properties" key="${secure.key}" />
+	<salesforce:sfdc-config name="Salesforce_Config_old" doc:name="Salesforce Config" doc:id="25f66a89-fb53-4426-a749-f1118cc7cc75" >
+		<salesforce:jwt-connection consumerKey="${secure::salesforce.consumer.key}" keyStore="${salesforce.keystore.path}" storePassword="${secure::salesforce.store.password}" certificateAlias="${salesforce.keystore.alias}" principal="${secure::salesforce.principal}" audienceUrl="${salesforce.audience}" tokenEndpoint="${salesforce.token.endpoint}" connectionTimeout="1"/>
+	</salesforce:sfdc-config>
+</mule>

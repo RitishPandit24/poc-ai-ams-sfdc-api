@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="retieve-employees-flow" doc:id="430f8cc5-9382-4e19-9ef5-453f5284f4a4" >
+		<salesforce:query doc:name="Query" doc:id="358747a5-a7d1-41cb-b7a8-59fdf08a91b1" config-ref="Salesforce_Config_old">
+			<salesforce:salesforce-query><![CDATA[${salesforce.retrieve}]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="5bbec067-6089-4934-b405-01c5cdbb9417">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map (employee) -> {
+    name: employee.Name,
+    empID: employee.Employee_ID__c,
+    age: employee.Age__c,
+    salary: employee.Salary__c,
+    isActive: employee.Is_Active__c,
+    joiningDate: employee.Joining_Date__c
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

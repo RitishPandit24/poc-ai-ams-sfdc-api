@@ -1,0 +1,62 @@
+#%RAML 1.0
+
+title: Employee Management API
+
+types:
+  EmployeeStructure: !include dataType/employeeStructure.raml
+  EmployeeResponse: !include dataType/employeeResponse.raml 
+
+/employees:
+  description: "Employee Management REST API"
+  post:
+    description: "create employees"
+    body:
+      application/json:
+        type: EmployeeStructure[]
+        example: !include examples/createEmployees.json
+    responses:
+      201:
+        body:
+          application/json:
+            type: EmployeeResponse
+            example: !include examples/createResponse.json
+  get:
+    description: "get all employees"
+    responses:
+      200:
+        body:
+          application/json:
+            type: EmployeeStructure[]
+            example: !include examples/retrieveEmployees.json
+  put:
+    description: "update particular employee details"
+    queryParameters:
+      empID:
+        type: integer
+        required: true
+        example: 101
+    body:
+      application/json:
+        type: EmployeeStructure
+        example: !include examples/updateEmployee.json
+    responses:
+      201:
+        body:
+          application/json:
+            type: EmployeeResponse
+            example: !include examples/updateResponse.json
+  delete:
+    description: "delete particular employee"
+    queryParameters:
+      empID:
+        type: integer
+        required: true
+        example: 101
+    responses:
+      201:
+        body:
+          application/json:
+            type: EmployeeResponse
+            example: !include examples/deleteResponse.json
+          
+          

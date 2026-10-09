@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="delete-employee-flow" doc:id="cbf72041-e104-479e-916f-8bc788a805c1" >
+		<salesforce:query doc:name="Query" doc:id="757db063-1b89-4dd3-b884-51eca96e6a66" config-ref="Salesforce_Config_old">
+			<salesforce:salesforce-query><![CDATA[${salesforce.delete.query}]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[{
+    empID: attributes.queryParams.empID
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="ca941253-3652-49c3-9398-c81f05a7223d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[payload[0].Id]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete" doc:id="4987c841-24e9-4bb0-b6ff-8a252d09ceba" config-ref="Salesforce_Config_old" />
+		<ee:transform doc:name="Transform Message" doc:id="e6ed375c-27b3-43bf-a034-af7f579e2da4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

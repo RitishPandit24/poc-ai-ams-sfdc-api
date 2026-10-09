@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="update-employee-flow" doc:id="5c0a165f-3253-4f2e-8123-d72ba87d918d" >
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="ee6f8b7e-01dd-4d70-a433-26aebf2bc9ce" variableName="employee" />
+		<try doc:name="Try" doc:id="19f12ba7-c7e3-4bf0-a5b3-41758a3d642d" >
+			<salesforce:query doc:name="Query" doc:id="a2f07993-1ea7-467e-8092-4a665d843d9f" config-ref="Salesforce_Config_old">
+			<salesforce:salesforce-query><![CDATA[${salesforce.query}]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[{
+    empID: attributes.queryParams.empID
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d88bb012-ed19-4d51-8c15-a762c9bc6c5f" type="SALESFORCE:COMMUNICATION, SALESFORCE:CONNECTIVITY, SALESFORCE:INSUFFICIENT_PERMISSIONS, SALESFORCE:INVALID_INPUT, SALESFORCE:INVALID_RESPONSE, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:OPERATION_NOT_SUPPORTED, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT, SALESFORCE:UNAVAILABLE">
+					<logger level="INFO" doc:name="Logger" doc:id="945dab16-fe03-4100-9996-3af782226d12" message="error"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="39abb133-6a84-426e-aef5-6e312c178616">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[
+    {
+        Id: payload[0].Id,
+        Name: vars.employee.name,
+        Employee_ID__c: vars.employee.empID,
+        Age__c: vars.employee.age,
+        Salary__c: vars.employee.salary,
+        Is_Active__c: vars.employee.isActive,
+        Joining_Date__c: vars.employee.joiningDate as Date
+    }
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update type="${create.type}" doc:name="Update" doc:id="2a3cf00b-6a47-4a2f-9fec-77a2e82c2407" config-ref="Salesforce_Config_old" />
+		<ee:transform doc:name="Transform Message" doc:id="4624cebf-0b90-4c4b-b542-d98aaf8a703c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    message: "employee updated successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

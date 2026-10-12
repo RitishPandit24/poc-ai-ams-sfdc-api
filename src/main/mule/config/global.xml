@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="dcdb0476-3502-4cc7-9d90-ed0356820194" >
@@ -14,4 +16,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	<salesforce:sfdc-config name="Salesforce_Config_old" doc:name="Salesforce Config" doc:id="25f66a89-fb53-4426-a749-f1118cc7cc75" >
 		<salesforce:jwt-connection consumerKey="${secure::salesforce.consumer.key}" keyStore="${salesforce.keystore.path}" storePassword="${secure::salesforce.store.password}" certificateAlias="${salesforce.keystore.alias}" principal="${secure::salesforce.principal}" audienceUrl="${salesforce.audience}" tokenEndpoint="${salesforce.token.endpoint}" connectionTimeout="1"/>
 	</salesforce:sfdc-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="78db190f-6968-45f9-8562-de6aca0eb1ed" >
+		<http:request-connection protocol="HTTPS" host="${dummy.host}" />
+	</http:request-config>
 </mule>

@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="43cdc79f-9dde-4f2b-adc6-1b48f74bfe34" >
+		<http:request-connection protocol="HTTPS" host="${dummy.products.host}" />
+	</http:request-config>
 	<sub-flow name="retieve-employees-flow" doc:id="430f8cc5-9382-4e19-9ef5-453f5284f4a4" >
-		<salesforce:query doc:name="Query" doc:id="358747a5-a7d1-41cb-b7a8-59fdf08a91b1" config-ref="Salesforce_Config_old">
+		<scatter-gather doc:name="Scatter-Gather" doc:id="daef5097-76ae-4ab8-bc7c-c27d76437508" >
+			<route >
+				<salesforce:query doc:name="Query" doc:id="358747a5-a7d1-41cb-b7a8-59fdf08a91b1" config-ref="Salesforce_Config_old">
 			<salesforce:salesforce-query><![CDATA[${salesforce.retrieve}]]></salesforce:salesforce-query>
 		</salesforce:query>
-		<ee:transform doc:name="Transform Message" doc:id="5bbec067-6089-4934-b405-01c5cdbb9417">
+				<ee:transform doc:name="Transform Message" doc:id="5bbec067-6089-4934-b405-01c5cdbb9417">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -22,6 +29,22 @@ payload map (employee) -> {
     isActive: employee.Is_Active__c,
     joiningDate: employee.Joining_Date__c
 }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="get_employees" doc:id="a8eb9d80-36d7-49ec-802e-dbe9bc2788bb" config-ref="HTTP_Request_configuration" path="${dummy.path}"/>
+			</route>
+			<route >
+				<http:request method="GET" doc:name="dummy_products" doc:id="f7694668-c0be-4ca7-8660-1eb0e60e6db9" config-ref="HTTP_Request_configuration1" path="${dummy.products.path}"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="892fa666-a604-40f5-bf82-f34d556abdaa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</sub-flow>

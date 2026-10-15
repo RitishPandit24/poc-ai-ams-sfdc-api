@@ -33,7 +33,7 @@ payload map (employee) -> {
 		</ee:transform>
 			</route>
 			<route >
-				<http:request method="GET" doc:name="get_employees" doc:id="a8eb9d80-36d7-49ec-802e-dbe9bc2788bb" config-ref="HTTP_Request_configuration" path="${dummy.path}"/>
+				<!-- [STUDIO:"get_employees"]<http:request method="GET" doc:name="get_employees" doc:id="a8eb9d80-36d7-49ec-802e-dbe9bc2788bb" config-ref="HTTP_Request_configuration" path="${dummy.path}"/> [STUDIO] -->
 			</route>
 			<route >
 				<http:request method="GET" doc:name="dummy_products" doc:id="f7694668-c0be-4ca7-8660-1eb0e60e6db9" config-ref="HTTP_Request_configuration1" path="${dummy.products.path}"/>

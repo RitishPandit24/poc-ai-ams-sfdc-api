@@ -12,7 +12,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	</salesforce:sfdc-config>
 	<configuration-properties doc:name="Env Configuration properties" doc:id="c917a5c6-93d3-4de0-8807-78f8bb1e0716" file="properties/${env}.properties" />
 	<configuration-properties doc:name="Default Configuration properties" doc:id="42a21c52-295b-4d6d-a0a3-c232b70a5f1c" file="properties/default.properties" />
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="9a2ebcc4-be44-4dba-b4b0-a4ef9e68de01" file="properties/${env}-secure.properties" key="${secure.key}" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="9a2ebcc4-be44-4dba-b4b0-a4ef9e68de01" file="properties/${env}-secure.properties" key="${secure.key}" >
+	</secure-properties:config>
 	<salesforce:sfdc-config name="Salesforce_Config_old" doc:name="Salesforce Config" doc:id="25f66a89-fb53-4426-a749-f1118cc7cc75" >
 		<salesforce:jwt-connection consumerKey="${secure::salesforce.consumer.key}" keyStore="${salesforce.keystore.path}" storePassword="${secure::salesforce.store.password}" certificateAlias="${salesforce.keystore.alias}" principal="${secure::salesforce.principal}" audienceUrl="${salesforce.audience}" tokenEndpoint="${salesforce.token.endpoint}" connectionTimeout="1"/>
 	</salesforce:sfdc-config>

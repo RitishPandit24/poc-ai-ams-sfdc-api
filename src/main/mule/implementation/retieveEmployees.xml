@@ -10,17 +10,18 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="43cdc79f-9dde-4f2b-adc6-1b48f74bfe34" >
 		<http:request-connection protocol="HTTPS" host="${dummy.products.host}" />
 	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="e833448d-d865-467e-be68-3ff3b501b589" >
+		<http:request-connection protocol="HTTPS" host="${employee.sapi.host}" />
+	</http:request-config>
 	<sub-flow name="retieve-employees-flow" doc:id="430f8cc5-9382-4e19-9ef5-453f5284f4a4" >
-		<scatter-gather doc:name="Scatter-Gather" doc:id="daef5097-76ae-4ab8-bc7c-c27d76437508" >
-			<route >
-				<salesforce:query doc:name="Query" doc:id="358747a5-a7d1-41cb-b7a8-59fdf08a91b1" config-ref="Salesforce_Config_old">
-			<salesforce:salesforce-query><![CDATA[${salesforce.retrieve}]]></salesforce:salesforce-query>
-		</salesforce:query>
-				<ee:transform doc:name="Transform Message" doc:id="5bbec067-6089-4934-b405-01c5cdbb9417">
+		<!-- [STUDIO:"Query"]<salesforce:query doc:name="Query" doc:id="358747a5-a7d1-41cb-b7a8-59fdf08a91b1" config-ref="Salesforce_Config_old">
+			<salesforce:salesforce-query><![CDATA[${salesforce.retrieve}&#93;&#93;></salesforce:salesforce-query>
+		</salesforce:query> [STUDIO] -->
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="5bbec067-6089-4934-b405-01c5cdbb9417">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
----
+&#45;&#45;-
 payload map (employee) -> {
     name: employee.Name,
     empID: employee.Employee_ID__c,
@@ -28,24 +29,18 @@ payload map (employee) -> {
     salary: employee.Salary__c,
     isActive: employee.Is_Active__c,
     joiningDate: employee.Joining_Date__c
-}]]></ee:set-payload>
+}&#93;&#93;></ee:set-payload>
 			</ee:message>
-		</ee:transform>
-			</route>
-			<route >
-				<!-- [STUDIO:"get_employees"]<http:request method="GET" doc:name="get_employees" doc:id="a8eb9d80-36d7-49ec-802e-dbe9bc2788bb" config-ref="HTTP_Request_configuration" path="${dummy.path}"/> [STUDIO] -->
-			</route>
-			<route >
-				<http:request method="GET" doc:name="dummy_products" doc:id="f7694668-c0be-4ca7-8660-1eb0e60e6db9" config-ref="HTTP_Request_configuration1" path="${dummy.products.path}"/>
-			</route>
-		</scatter-gather>
-		<ee:transform doc:name="Transform Message" doc:id="892fa666-a604-40f5-bf82-f34d556abdaa" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
+		</ee:transform> [STUDIO] -->
+		<logger level="INFO" doc:name="Logger" doc:id="39fc6815-11a4-470f-91bc-4a3df9d73e2d" message="retieve-employees-flow -  Start"/>
+		<http:request method="GET" doc:name="Request" doc:id="b15830a2-885d-4f0b-a1d2-678e23d37285" config-ref="HTTP_Request_configuration2" path="${employee.sapi.path}">
+			<http:headers ><![CDATA[#[output application/java
 ---
-payload]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+{
+	"client_secret" : Mule::p('secure::employee.clientSecret'),
+	"client_id" : Mule::p('secure::employee.clientId')
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="a86f4c2a-6d62-42bc-820a-bfea8eb727c7" message="retieve-employees-flow -  End"/>
 	</sub-flow>
 </mule>

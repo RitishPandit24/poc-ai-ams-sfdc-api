@@ -34,11 +34,12 @@ payload map (employee) -> {
 		</ee:transform> [STUDIO] -->
 		<logger level="INFO" doc:name="Logger" doc:id="39fc6815-11a4-470f-91bc-4a3df9d73e2d" message="retieve-employees-flow -  Start"/>
 		<http:request method="GET" doc:name="Request" doc:id="b15830a2-885d-4f0b-a1d2-678e23d37285" config-ref="HTTP_Request_configuration2" path="${employee.sapi.path}">
+			<!-- Replace "client_secret" and "client_id" in headers with an appropriate Authorization header or omit if not required -->
+			<!-- Example Authorization header with Basic auth (encode clientId:clientSecret in base64): -->
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	"client_secret" : Mule::p('secure::employee.clientSecret'),
-	"client_id" : Mule::p('secure::employee.clientId')
+  Authorization: "Basic " ++ (Mule::p('secure::employee.clientId') ++ ":" ++ Mule::p('secure::employee.clientSecret')) as String as Base64
 }]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="Logger" doc:id="a86f4c2a-6d62-42bc-820a-bfea8eb727c7" message="retieve-employees-flow -  End"/>

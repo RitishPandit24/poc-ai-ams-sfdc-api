@@ -33,14 +33,21 @@ payload map (employee) -> {
 			</ee:message>
 		</ee:transform> [STUDIO] -->
 		<logger level="INFO" doc:name="Logger" doc:id="39fc6815-11a4-470f-91bc-4a3df9d73e2d" message="retieve-employees-flow -  Start"/>
-		<http:request method="GET" doc:name="Request" doc:id="b15830a2-885d-4f0b-a1d2-678e23d37285" config-ref="HTTP_Request_configuration2" path="${employee.sapi.path}">
-			<http:headers ><![CDATA[#[output application/java
+		<try doc:name="Try" doc:id="d6747aac-bfdc-4daa-9b7a-f1ee903acc99" >
+			<http:request method="GET" doc:name="Request" doc:id="b15830a2-885d-4f0b-a1d2-678e23d37285" config-ref="HTTP_Request_configuration2" path="${employee.sapi.path}">
+			<http:headers><![CDATA[#[output application/java
 ---
 {
 	"client_secret" : Mule::p('secure::employee.clientSecret'),
 	"client_id" : Mule::p('secure::employee.clientId')
 }]]]></http:headers>
 		</http:request>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c9683afe-4798-4b87-b8b7-b294c863a7d7" type="ANY">
+					<logger level="INFO" doc:name="Logger" doc:id="206b40c7-3940-4bd4-865d-82a00af3385b" message="#[error.errorMessage.payload.message]"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
 		<logger level="INFO" doc:name="Logger" doc:id="a86f4c2a-6d62-42bc-820a-bfea8eb727c7" message="retieve-employees-flow -  End"/>
 	</sub-flow>
 </mule>

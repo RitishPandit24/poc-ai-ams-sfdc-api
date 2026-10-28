@@ -45,6 +45,12 @@ output application/json
     appId: app.name default ""
 }]]></ee:set-payload>
 						</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+error.errorMessage.attributes.statusCode]]></ee:set-variable>
+							</ee:variables>
 					</ee:transform>
 					<logger level="INFO" doc:name="Logger" doc:id="a023f31d-a187-438e-83da-fb603806ac9b" message="#[payload]"/>
 				</on-error-propagate>
